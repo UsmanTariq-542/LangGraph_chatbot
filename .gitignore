@@ -1,0 +1,12 @@
+# Databases
+*.db
+*.db-journal
+*.db-wal
+
+# VS Code settings
+.vscode/
+
+# Environment files
+.env
+.venv
+__pycache__/
