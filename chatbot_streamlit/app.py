@@ -79,12 +79,26 @@ st.sidebar.title('Persistent AI')
 # new chat delete button
 if st.sidebar.button('Reset All Conversations'):
     import os
-    # Apni database file ka sahi naam likhein (e.g., 'chatbot_state.db')
-    if os.path.exists("chatbot_state.db"): 
-        os.remove("chatbot_state.db")
+    import sqlite3
+    
+    # 1. Sabse pehle agar koi connection open hai, usay close karein
+    try:
+        # Aapke backend code ka instance agar 'chatbot' hai, toh uske checkpointer ko access karein
+        # Agar error aaye, toh bas niche wali lines run karein
+        if 'chatbot' in globals():
+            # Agar possible ho toh connection close karein
+            pass 
+            
+        # 2. Files ko delete karein
+        db_files = ["chatbot_state.db", "chat_history.db"]
+        for db_file in db_files:
+            if os.path.exists(db_file):
+                os.remove(db_file)
+        
         st.sidebar.success("Database Reset!")
-        st.rerun() # Page ko refresh karke naye sire se start karega
-# ------------------------------
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Error: {e}")
 
 
 if st.sidebar.button('New Chat'):
