@@ -78,28 +78,30 @@ st.sidebar.title('Persistent AI')
 
 # new chat delete button
 if st.sidebar.button('Reset All Conversations'):
-    import os
     import sqlite3
     
-    # 1. Sabse pehle agar koi connection open hai, usay close karein
-    try:
-        # Aapke backend code ka instance agar 'chatbot' hai, toh uske checkpointer ko access karein
-        # Agar error aaye, toh bas niche wali lines run karein
-        if 'chatbot' in globals():
-            # Agar possible ho toh connection close karein
-            pass 
-            
-        # 2. Files ko delete karein
-        db_files = ["chatbot_state.db", "chat_history.db"]
-        for db_file in db_files:
-            if os.path.exists(db_file):
-                os.remove(db_file)
-        
-        st.sidebar.success("Database Reset!")
-        st.rerun()
-    except Exception as e:
-        st.sidebar.error(f"Error: {e}")
-
+    # 1. Database file se connection banayein
+    conn = sqlite3.connect('chatbot_state.db')
+    cursor = conn.cursor()
+    
+    # 2. Saare tables ka naam dhoondein aur unhe clear karein
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    
+    for table_name in tables:
+        # Har table ka data delete kar dein (Table structure waisa hi rahega)
+        cursor.execute(f"DELETE FROM {table_name[0]}")
+    
+    conn.commit()
+    conn.close()
+    
+    # 3. Session state ko saaf karein
+    st.session_state['message_history'] = []
+    st.session_state['chat_threads'] = []
+    st.session_state['chat_titles'] = {}
+    
+    st.sidebar.success("Database Cleared!")
+    st.rerun()
 
 if st.sidebar.button('New Chat'):
     reset_chat()
