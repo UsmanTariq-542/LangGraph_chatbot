@@ -74,7 +74,18 @@ for thread in st.session_state['chat_threads']:
 
 # **************************************** Sidebar UI *********************************
 
-st.sidebar.title('LangGraph Chatbot')
+st.sidebar.title('Persistent AI')
+
+# new chat delete button
+if st.sidebar.button('Reset All Conversations'):
+    import os
+    # Apni database file ka sahi naam likhein (e.g., 'chatbot_state.db')
+    if os.path.exists("chatbot_state.db"): 
+        os.remove("chatbot_state.db")
+        st.sidebar.success("Database Reset!")
+        st.rerun() # Page ko refresh karke naye sire se start karega
+# ------------------------------
+
 
 if st.sidebar.button('New Chat'):
     reset_chat()
